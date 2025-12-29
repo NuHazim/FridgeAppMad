@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Shopping Item"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Item Name"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/etItemName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. Milk, Eggs, Chicken..."
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quantity"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/etQuantity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. 1 gallon, 2lbs..."
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quick Add Common Items:"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="12dp" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="3"
+        android:rowCount="3"
+        android:layout_marginBottom="24dp">
+
+        <Button
+            android:id="@+id/btnMilk"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Milk"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnEggs"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Eggs"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnBread"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Bread"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnButter"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Butter"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnChicken"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Chicken"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnTomatoes"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Tomatoes"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnRice"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Rice"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnLettuce"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Lettuce"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnOil"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
+            android:text="Cooking Oil"
+            android:textSize="12sp"
+            android:background="#FFE8CC"
+            android:padding="8dp" />
+    </GridLayout>
+
+    <Button
+        android:id="@+id/btnAddItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Item"
+        android:textColor="#FFFFFF"
+        android:background="#FFB74D"
+        android:padding="12dp"
+        android:textStyle="bold" />
+</LinearLayout>
