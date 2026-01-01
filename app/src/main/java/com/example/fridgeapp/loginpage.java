@@ -18,6 +18,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Firebase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+
 public class loginpage extends AppCompatActivity {
 
     private LinearLayout welcomeLayout;
@@ -59,8 +65,11 @@ public class loginpage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loginpage);
 
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
         initializeViews();
         setupListeners();
+        setupSignUpAndLogin(auth);
     }
 
     private void initializeViews() {
@@ -102,16 +111,19 @@ public class loginpage extends AppCompatActivity {
 
         btnWelcomeLogin.setOnClickListener(v -> showLoginPage());
         btnWelcomeCreateAccount.setOnClickListener(v -> showRegisterPage());
-
         btnRegisterTogglePassword.setOnClickListener(v -> toggleRegisterPasswordVisibility());
-        btnSignUp.setOnClickListener(v -> handleSignUp());
+
         tvRegisterLogin.setOnClickListener(v -> showLoginPage());
 
         btnLoginTogglePassword.setOnClickListener(v -> toggleLoginPasswordVisibility());
-        btnLogin.setOnClickListener(v -> handleLogin());
         tvForgotPassword.setOnClickListener(v ->
                 Toast.makeText(this, "Coming soon", Toast.LENGTH_SHORT).show());
         tvLoginSignUp.setOnClickListener(v -> showRegisterPage());
+    }
+
+    private void setupSignUpAndLogin(FirebaseAuth auth){
+        btnLogin.setOnClickListener(v -> handleLogin(auth));
+        btnSignUp.setOnClickListener(v -> handleSignUp(auth));
     }
 
     private void showWelcomePage() {
@@ -152,7 +164,7 @@ public class loginpage extends AppCompatActivity {
         etLoginPassword.setSelection(etLoginPassword.getText().length());
     }
 
-    private void handleSignUp() {
+    private void handleSignUp(FirebaseAuth auth) {
 
         String username = etRegisterUsername.getText().toString().trim();
         String email = etRegisterEmail.getText().toString().trim();
@@ -166,21 +178,33 @@ public class loginpage extends AppCompatActivity {
         pbRegister.setVisibility(View.VISIBLE);
         btnSignUp.setEnabled(false);
 
-        new android.os.Handler().postDelayed(() -> {
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(result -> {
+                    FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(auth.getUid())
+                            .set(new HashMap<String, Object>() {{
+                                put("email", email);
+                            }});
 
-            pbRegister.setVisibility(View.GONE);
-            btnSignUp.setEnabled(true);
-
-            Toast.makeText(this, "Register success", Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(loginpage.this, homepage.class);
-            startActivity(intent);
-            finish();
-
-        }, 2000);
+                    startActivity(new Intent(this, homepage.class));
+                    finish();
+                });
+//        new android.os.Handler().postDelayed(() -> {
+//
+//            pbRegister.setVisibility(View.GONE);
+//            btnSignUp.setEnabled(true);
+//
+//            Toast.makeText(this, "Register success", Toast.LENGTH_SHORT).show();
+//
+//            Intent intent = new Intent(loginpage.this, homepage.class);
+//            startActivity(intent);
+//            finish();
+//
+//        }, 2000);
     }
 
-    private void handleLogin() {
+    private void handleLogin(FirebaseAuth auth) {
 
         String email = etLoginEmail.getText().toString().trim();
         String password = etLoginPassword.getText().toString();
@@ -193,18 +217,27 @@ public class loginpage extends AppCompatActivity {
         pbLogin.setVisibility(View.VISIBLE);
         btnLogin.setEnabled(false);
 
-        new android.os.Handler().postDelayed(() -> {
 
-            pbLogin.setVisibility(View.GONE);
-            btnLogin.setEnabled(true);
+        auth.signInWithEmailAndPassword(email, password).addOnSuccessListener(result -> {
+                    startActivity(new Intent(this, homepage.class));
+                    finish();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show()
+                );
 
-            Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(loginpage.this, homepage.class);
-            startActivity(intent);
-            finish();
-
-        }, 2000);
+//        new android.os.Handler().postDelayed(() -> {
+//
+//            pbLogin.setVisibility(View.GONE);
+//            btnLogin.setEnabled(true);
+//
+//            Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
+//
+//            Intent intent = new Intent(loginpage.this, homepage.class);
+//            startActivity(intent);
+//            finish();
+//
+//        }, 2000);
     }
 
     @Override

@@ -6,7 +6,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.material.tabs.TabLayout;
+import com.example.fridgeapp.inventory.InventoryFragment;
+
 
 public class homepage extends AppCompatActivity {
 
@@ -30,7 +33,7 @@ public class homepage extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
 
         // Load default fragment (Inventory)
-        loadFragment(new inventoryFragment());
+        loadFragment(new InventoryFragment());
 
         // Setup tab selection listener
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -40,7 +43,7 @@ public class homepage extends AppCompatActivity {
 
                 switch (tab.getPosition()) {
                     case 0:
-                        selectedFragment = new inventoryFragment();
+                        selectedFragment = new InventoryFragment();
                         break;
                     case 1:
                         selectedFragment = new shoppingFragment();
