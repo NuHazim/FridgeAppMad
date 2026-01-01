@@ -1,0 +1,75 @@
+package com.example.fridgeapp.inventory;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.fridgeapp.R;
+
+import java.util.List;
+
+public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder> {
+
+    private final List<FridgeItem> itemList;
+
+    public FridgeAdapter(List<FridgeItem> itemList ) {
+        this.itemList = itemList;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_fridge, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        FridgeItem item = itemList.get(position);
+
+        holder.tvName.setText(item.name);
+        holder.tvCategory.setText("Category: " + item.category);
+        holder.tvQuantity.setText(item.quantity + " " + item.unit);
+
+        long daysLeft = item.getDaysLeft();
+        if(daysLeft < 0)holder.tvExpiry.setText("Expired");
+        else holder.tvExpiry.setText(daysLeft + " days left");
+
+
+
+        holder.btnDelete.setOnClickListener(v -> {
+            itemList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, itemList.size());
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemList.size();
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        TextView tvName, tvCategory, tvExpiry, tvQuantity, tvUnit; // add tvUnit
+        ImageButton btnDelete;
+
+        ViewHolder(View itemView) {
+            super(itemView);
+            tvName = itemView.findViewById(R.id.tvName);
+            tvCategory = itemView.findViewById(R.id.tvCategory);
+            tvExpiry = itemView.findViewById(R.id.tvExpiry);
+            tvQuantity = itemView.findViewById(R.id.tvQuantity);
+            tvUnit = itemView.findViewById(R.id.tvUnit); // initialize it
+            btnDelete = itemView.findViewById(R.id.btnDelete);
+        }
+    }
+
+}
+
