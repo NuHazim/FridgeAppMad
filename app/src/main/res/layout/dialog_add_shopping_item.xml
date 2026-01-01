@@ -3,183 +3,223 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:background="@android:color/white">
+    android:padding="20dp"
+    android:background="#FFFFFF">
 
-    <TextView
+    <!-- Header with Close Button -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Shopping Item"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="#333333"
-        android:layout_marginBottom="16dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Shopping Item"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#333333" />
+
+        <TextView
+            android:id="@+id/btnClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="×"
+            android:textSize="24sp"
+            android:textColor="#999999"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+    <!-- Item Name Label -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Item Name"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:textColor="#666666"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="8dp" />
 
+    <!-- Item Name Input -->
     <EditText
         android:id="@+id/etItemName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="e.g. Milk, Eggs, Chicken..."
+        android:textSize="14sp"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
         android:layout_marginBottom="16dp" />
 
+    <!-- Quantity Label -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Quantity"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:textColor="#666666"
         android:layout_marginBottom="8dp" />
 
+    <!-- Quantity Input -->
     <EditText
         android:id="@+id/etQuantity"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="e.g. 1 gallon, 2lbs..."
+        android:textSize="14sp"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="20dp" />
 
+    <!-- Quick Add Label -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Quick Add Common Items:"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:textColor="#666666"
         android:layout_marginBottom="12dp" />
 
+    <!-- Quick Add Buttons Grid -->
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="3"
         android:rowCount="3"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="20dp">
 
         <Button
             android:id="@+id/btnMilk"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Milk"
             android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnEggs"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Eggs"
             android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnBread"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Bread"
             android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnButter"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Butter"
             android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnChicken"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Chicken"
             android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnTomatoes"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Tomatoes"
             android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnRice"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Rice"
             android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnLettuce"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Lettuce"
             android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnOil"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp"
+            android:layout_margin="3dp"
             android:text="Cooking Oil"
-            android:textSize="12sp"
-            android:background="#FFE8CC"
-            android:padding="8dp" />
+            android:textSize="11sp"
+            android:textColor="#8D6E63"
+            android:background="@drawable/btn_quick_add"
+            android:textAllCaps="false" />
     </GridLayout>
 
+    <!-- Add Item Button -->
     <Button
         android:id="@+id/btnAddItem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="Add Item"
         android:textColor="#FFFFFF"
-        android:background="#FFB74D"
-        android:padding="12dp"
-        android:textStyle="bold" />
+        android:textSize="15sp"
+        android:background="@drawable/btn_add_item"
+        android:textStyle="bold"
+        android:textAllCaps="false" />
 </LinearLayout>

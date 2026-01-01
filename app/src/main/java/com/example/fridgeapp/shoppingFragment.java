@@ -2,86 +2,141 @@ package com.example.fridgeapp;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.fridgeapp.adapter.ShoppingAdapter;
 import com.example.fridgeapp.model.ShoppingItem;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class shoppingFragment extends Fragment {
 
+    private static final String TAG = "ShoppingFragment";
     private RecyclerView recyclerView;
     private ShoppingAdapter adapter;
-    private FloatingActionButton fabAddItem;
+    private LinearLayout btnAddItemBar;
     private TextView tvItemCount;
+    private TextView tvCompletedCount;
     private TextView tvEmptyState;
 
-    private List<ShoppingItem> shoppingItems = new ArrayList<>();
-    private List<ShoppingItem> inventoryItems = new ArrayList<>();
+    private ShoppingListManager shoppingListManager;
+    private List<ShoppingItem> shoppingItems;
+    private boolean isFirstLoad = true;
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView called");
         View view = inflater.inflate(R.layout.shoppingfrag, container, false);
 
+        // Get the singleton instance
+        shoppingListManager = ShoppingListManager.getInstance();
+        shoppingItems = shoppingListManager.getShoppingItems();
+
+        // Find all views
         recyclerView = view.findViewById(R.id.recyclerViewShopping);
-        fabAddItem = view.findViewById(R.id.fabAddItem);
+        btnAddItemBar = view.findViewById(R.id.btnAddItemBar);
         tvItemCount = view.findViewById(R.id.tvItemCount);
+        tvCompletedCount = view.findViewById(R.id.tvCompletedCount);
         tvEmptyState = view.findViewById(R.id.tvEmptyState);
 
-        setupRecyclerView();
-        loadShoppingItems();
+        Log.d(TAG, "Views initialized");
 
-        fabAddItem.setOnClickListener(v -> showAddItemDialog());
+        // Only add sample items if list is empty on first app launch
+        if (shoppingItems.isEmpty() && isFirstLoad) {
+            addSampleItems();
+            isFirstLoad = false;
+        }
+
+        // Setup adapter
+        setupAdapter();
+
+        // Setup click listener for add button bar
+        btnAddItemBar.setOnClickListener(v -> {
+            Log.d(TAG, "Add button clicked");
+            showAddItemDialog();
+        });
 
         return view;
     }
 
-    private void setupRecyclerView() {
+    private void addSampleItems() {
+        shoppingListManager.addItem(new ShoppingItem(
+                UUID.randomUUID().toString(),
+                "Milk",
+                "2 bottles",
+                false
+        ));
+        shoppingListManager.addItem(new ShoppingItem(
+                UUID.randomUUID().toString(),
+                "Bread",
+                "2 loaves",
+                false
+        ));
+        shoppingListManager.addItem(new ShoppingItem(
+                UUID.randomUUID().toString(),
+                "Apples",
+                "5pcs",
+                false
+        ));
+
+        Log.d(TAG, "Sample items added. Total items: " + shoppingItems.size());
+    }
+
+    private void setupAdapter() {
+        Log.d(TAG, "Setting up adapter with " + shoppingItems.size() + " items");
+
         adapter = new ShoppingAdapter(
                 shoppingItems,
                 (item, isChecked) -> {
+                    Log.d(TAG, "Item checked: " + item.getName());
+                    item.setCompleted(isChecked);
+                    updateUI();
                     if (isChecked) {
-                        moveToInventory(item);
+                        Toast.makeText(getContext(), item.getName() + " marked as completed!", Toast.LENGTH_SHORT).show();
                     }
                 },
-                this::deleteItem
+                item -> {
+                    Log.d(TAG, "Item deleted: " + item.getName());
+                    shoppingListManager.removeItem(item);
+                    adapter.notifyDataSetChanged();
+                    updateUI();
+                    Toast.makeText(getContext(), "Item removed", Toast.LENGTH_SHORT).show();
+                }
         );
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(false);
+        recyclerView.setNestedScrollingEnabled(true);
         recyclerView.setAdapter(adapter);
+
+        updateUI();
+
+        Log.d(TAG, "Adapter setup complete");
     }
 
-    private void loadShoppingItems() {
-        if (shoppingItems.isEmpty()) {
-            shoppingItems.add(new ShoppingItem(
-                    UUID.randomUUID().toString(),
-                    "Milk",
-                    "2 bottles",
-                    false
-            ));
-            shoppingItems.add(new ShoppingItem(
-                    UUID.randomUUID().toString(),
-                    "Bread",
-                    "1 loaf",
-                    false
-            ));
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+            updateUI();
         }
-
-        adapter.updateItems(shoppingItems);
-        updateItemCount();
-        updateEmptyState();
+        Log.d(TAG, "onResume - Items: " + shoppingItems.size());
     }
 
     private void showAddItemDialog() {
@@ -91,11 +146,16 @@ public class shoppingFragment extends Fragment {
         EditText etItemName = dialogView.findViewById(R.id.etItemName);
         EditText etQuantity = dialogView.findViewById(R.id.etQuantity);
         Button btnAddItem = dialogView.findViewById(R.id.btnAddItem);
+        TextView btnClose = dialogView.findViewById(R.id.btnClose);
 
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setView(dialogView)
                 .create();
 
+        // Close button
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        // Quick add buttons
         setupQuickAddButton(dialogView, R.id.btnMilk, "Milk", etItemName);
         setupQuickAddButton(dialogView, R.id.btnEggs, "Eggs", etItemName);
         setupQuickAddButton(dialogView, R.id.btnBread, "Bread", etItemName);
@@ -120,7 +180,7 @@ public class shoppingFragment extends Fragment {
                 return;
             }
 
-            addShoppingItem(itemName, quantity);
+            addItem(itemName, quantity);
             dialog.dismiss();
         });
 
@@ -134,7 +194,9 @@ public class shoppingFragment extends Fragment {
         }
     }
 
-    private void addShoppingItem(String name, String quantity) {
+    private void addItem(String name, String quantity) {
+        Log.d(TAG, "Adding item: " + name);
+
         ShoppingItem newItem = new ShoppingItem(
                 UUID.randomUUID().toString(),
                 name,
@@ -142,54 +204,35 @@ public class shoppingFragment extends Fragment {
                 false
         );
 
-        shoppingItems.add(newItem);
-        adapter.updateItems(shoppingItems);
-        updateItemCount();
-        updateEmptyState();
+        shoppingListManager.addItem(newItem);
+        adapter.notifyDataSetChanged();
+        updateUI();
 
-        Toast.makeText(getContext(), "Item added to shopping list", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Item added!", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Total items now: " + shoppingItems.size());
     }
 
-    private void moveToInventory(ShoppingItem item) {
-        inventoryItems.add(item);
-        shoppingItems.remove(item);
-
-        adapter.updateItems(shoppingItems);
-        updateItemCount();
-        updateEmptyState();
-
-        Toast.makeText(getContext(),
-                item.getName() + " moved to inventory",
-                Toast.LENGTH_SHORT).show();
-    }
-
-    private void deleteItem(ShoppingItem item) {
-        shoppingItems.remove(item);
-        adapter.removeItem(item);
-        updateItemCount();
-        updateEmptyState();
-
-        Toast.makeText(getContext(), "Item removed", Toast.LENGTH_SHORT).show();
-    }
-
-    private void updateItemCount() {
+    private void updateUI() {
         int count = shoppingItems.size();
         int completedCount = 0;
+
         for (ShoppingItem item : shoppingItems) {
             if (item.isCompleted()) {
                 completedCount++;
             }
         }
-        tvItemCount.setText(count + " items to buy • " + completedCount + " completed");
-    }
 
-    private void updateEmptyState() {
-        if (shoppingItems.isEmpty()) {
+        tvItemCount.setText(count + " items to buy");
+        tvCompletedCount.setText(completedCount + " completed");
+
+        if (count == 0) {
             tvEmptyState.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
             tvEmptyState.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+
+        Log.d(TAG, "UI updated. Items: " + count + ", Completed: " + completedCount);
     }
 }
