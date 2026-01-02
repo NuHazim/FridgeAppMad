@@ -1,6 +1,8 @@
 package com.example.fridgeapp;
 
 import android.os.Bundle;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -9,6 +11,14 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.tabs.TabLayout;
 import com.example.fridgeapp.inventory.InventoryFragment;
+import com.google.firebase.Firebase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class homepage extends AppCompatActivity {
@@ -16,10 +26,26 @@ public class homepage extends AppCompatActivity {
     private TabLayout tabLayout;
     private FragmentManager fragmentManager;
 
+    private TextView tvItemsCount;
+    private TextView tvExpiringCount;
+    private TextView tvToBuyCount;
+
+    private FirebaseFirestore db;
+    private FirebaseAuth auth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.homepage);
+
+        tvItemsCount = findViewById(R.id.tvItemsCount);
+        tvExpiringCount = findViewById(R.id.tvExpiringCount);
+        tvToBuyCount = findViewById(R.id.tvToBuyCount);
+
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+
+        listenForItemsCount();
 
         // Setup Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -68,6 +94,45 @@ public class homepage extends AppCompatActivity {
                 // Not needed
             }
         });
+    }
+
+    private void listenForItemsCount() {
+        String userId = auth.getCurrentUser().getUid();
+
+        db.collection("users")
+                .document(userId)
+                .collection("items")
+                .addSnapshotListener((snapshot, e) ->{
+
+                    if(snapshot == null) return;
+
+                    int totalItems = snapshot.size();
+                    int expiringSoon = 0;
+//                    int itemToBuy = 0;
+
+                    long now = System.currentTimeMillis();
+
+                    for(DocumentSnapshot doc : snapshot){
+                        String expiry = doc.getString("expiry");
+                        if(expiry == null) continue;
+
+                        try{
+                            SimpleDateFormat sdf =
+                                    new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+                            Date expiryDate = sdf.parse(expiry);
+
+                            long diffDays =
+                                    (expiryDate.getTime() - now) / (1000 * 60 * 60 * 24);
+
+                            if (diffDays <= 3) {
+                                expiringSoon++;
+                            }
+                        }catch (Exception ignored){}
+                    }
+                    tvItemsCount.setText(String.valueOf(totalItems));
+                    tvExpiringCount.setText(String.valueOf(expiringSoon));
+                });
     }
 
     private void loadFragment(Fragment fragment) {
