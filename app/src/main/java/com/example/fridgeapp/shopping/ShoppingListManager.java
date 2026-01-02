@@ -1,4 +1,4 @@
-package com.example.fridgeapp;
+package com.example.fridgeapp.shopping;
 
 import com.example.fridgeapp.model.ShoppingItem;
 import java.util.ArrayList;

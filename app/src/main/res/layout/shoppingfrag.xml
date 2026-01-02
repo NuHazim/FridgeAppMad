@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#FFE8E8"
-    tools:context=".shoppingFragment">
+    tools:context=".shopping.shoppingFragment">
 
     <!-- Add Item Button (Yellow Bar) -->
     <LinearLayout

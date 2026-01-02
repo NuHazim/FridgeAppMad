@@ -1,4 +1,4 @@
-package com.example.fridgeapp.adapter;
+package com.example.fridgeapp.shopping;
 
 import android.view.LayoutInflater;
 import android.view.View;
