@@ -177,13 +177,14 @@ public class InventoryFragment extends Fragment {
             String unit
     ) {
         String userId = auth.getCurrentUser().getUid();
-        FridgeItem item = new FridgeItem(name, category, expiry, quantity, unit);
+        FridgeItem item = new FridgeItem(null, name, category, expiry, quantity, unit);
 
         db.collection("users")
                 .document(userId)
                 .collection("items")
                 .add(item)
                 .addOnSuccessListener(doc -> {
+                    item.docId = doc.getId();
                     fridgeItemList.add(item);
                     adapter.notifyItemInserted(fridgeItemList.size() - 1);
                 })
@@ -192,8 +193,6 @@ public class InventoryFragment extends Fragment {
                                 "Failed to save item",
                                 Toast.LENGTH_SHORT).show()
                 );
-        // 🔜 Later replace this with Firestore:
-        // itemsRef.add(new FridgeItem(...));
     }
 
     private void loadItemsFromDb() {
@@ -210,6 +209,7 @@ public class InventoryFragment extends Fragment {
 
                     for (DocumentSnapshot doc : query.getDocuments()) {
                         FridgeItem item = doc.toObject(FridgeItem.class);
+                        item.docId = doc.getId();
                         fridgeItemList.add(item);
                     }
 
