@@ -6,7 +6,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class FridgeItem {
-    public int id;
+    public String docId;
     public String name;
     public String category;
     public String expiry;
@@ -16,7 +16,8 @@ public class FridgeItem {
 
     public FridgeItem(){
     }
-    public FridgeItem(String name, String category, String expiry, int quantity, String unit) {
+    public FridgeItem(String docId, String name, String category, String expiry, int quantity, String unit) {
+        this.docId = docId;
         this.name = name;
         this.category = category;
         this.expiry = expiry;
