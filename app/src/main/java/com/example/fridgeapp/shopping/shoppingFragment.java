@@ -1,4 +1,4 @@
-package com.example.fridgeapp;
+package com.example.fridgeapp.shopping;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -16,7 +16,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.fridgeapp.adapter.ShoppingAdapter;
+
+import com.example.fridgeapp.R;
 import com.example.fridgeapp.model.ShoppingItem;
 import java.util.List;
 import java.util.UUID;

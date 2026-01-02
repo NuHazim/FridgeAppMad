@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.fridgeapp.shopping.shoppingFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.example.fridgeapp.inventory.InventoryFragment;
 

@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#FFE8E8"
-    tools:context=".shoppingFragment">
+    android:orientation="vertical"
+    tools:context=".shopping.shoppingFragment">
 
     <!-- Add Item Button (Yellow Bar) -->
     <LinearLayout
@@ -14,26 +14,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFD54F"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center">
+        android:padding="12dp">
 
         <TextView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:text="+"
-            android:textSize="20sp"
-            android:textColor="#FFFFFF"
             android:gravity="center"
+            android:text="+"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Item to the Shopping List"
-            android:textSize="14sp"
-            android:textColor="#FFFFFF"
             android:layout_marginStart="8dp"
+            android:text="Add Item to the Shopping List"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -53,16 +53,16 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="0 items to buy"
-            android:textSize="13sp"
-            android:textColor="#8D6E63" />
+            android:textColor="#8D6E63"
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/tvCompletedCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 completed"
-            android:textSize="13sp"
-            android:textColor="#8D6E63" />
+            android:textColor="#8D6E63"
+            android:textSize="13sp" />
     </LinearLayout>
 
     <!-- RecyclerView with proper weight -->
@@ -77,12 +77,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingTop="4dp"
-            android:paddingBottom="8dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:scrollbars="vertical"
             android:overScrollMode="always"
+            android:paddingStart="8dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
+            android:scrollbars="vertical"
             tools:listitem="@layout/item_shopping" />
 
         <!-- Empty State -->
@@ -90,13 +90,13 @@
             android:id="@+id/tvEmptyState"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No items in shopping list\nTap the button above to add items"
-            android:textSize="16sp"
-            android:textColor="#999999"
-            android:textAlignment="center"
+            android:layout_gravity="center"
             android:gravity="center"
-            android:visibility="gone"
-            android:layout_gravity="center" />
+            android:text="No items in shopping list\nTap the button above to add items"
+            android:textAlignment="center"
+            android:textColor="#999999"
+            android:textSize="16sp"
+            android:visibility="gone" />
     </FrameLayout>
 
 </LinearLayout>
