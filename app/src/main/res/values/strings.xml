@@ -31,6 +31,7 @@
     <string name="acc_header_about">About</string>
 
     <string name="acc_username">Username</string>
+    <string name="acc_email">email@gmail.com</string>
     <string name="acc_sign_out">Sign Out</string>
 
     <string name="acc_expiry_reminders">Expiry Reminders</string>

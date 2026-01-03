@@ -7,7 +7,7 @@
     android:background="#fafafa">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar2"
+        android:id="@+id/acc_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@android:color/white"
@@ -23,14 +23,14 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/ic_back"
+                android:id="@+id/acc_ic_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 app:srcCompat="@drawable/acc_back_icon" />
 
             <TextView
-                android:id="@+id/Title"
+                android:id="@+id/acc_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="15"
@@ -43,14 +43,14 @@
     </androidx.appcompat.widget.Toolbar>
 
     <View
-        android:id="@+id/toolbar_line"
+        android:id="@+id/acc_toolbar_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#e9eaeb"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar2" />
+        app:layout_constraintTop_toBottomOf="@+id/acc_toolbar" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -58,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar2">
+        app:layout_constraintTop_toBottomOf="@+id/acc_toolbar_line">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -79,7 +79,7 @@
                 app:layout_marginBaseline="16dp">
 
                 <TextView
-                    android:id="@+id/acc_header_about"
+                    android:id="@+id/acc_header_account"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="18dp"
@@ -88,7 +88,7 @@
                     android:textSize="16sp" />
 
                 <View
-                    android:id="@+id/acc_line_about"
+                    android:id="@+id/acc_line_account"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#e9eaeb" />
@@ -103,14 +103,14 @@
                     android:paddingRight="18dp">
 
                     <LinearLayout
-                        android:id="@+id/acc_user"
+                        android:id="@+id/acc_account_user_row"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="12dp"
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:id="@+id/acc_ic_help"
+                            android:id="@+id/acc_account_ic_user"
                             android:layout_width="30dp"
                             android:layout_height="match_parent"
                             android:layout_marginEnd="16dp"
@@ -122,19 +122,19 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/acc_help_support"
+                                android:id="@+id/acc_account_name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
-                                android:text="Afan"
+                                android:text="@string/acc_username"
                                 android:textSize="16sp" />
 
                             <TextView
-                                android:id="@+id/acc_help_and_support_desc"
+                                android:id="@+id/acc_account_email"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
-                                android:text="afan@gmail.com"
+                                android:text="email"
                                 android:textColor="#807e7e"
                                 android:textSize="16sp" />
                         </LinearLayout>
@@ -142,14 +142,14 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/acc_sign_out"
+                        android:id="@+id/acc_account_sign_out_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:id="@+id/acc_ic_info"
+                            android:id="@+id/acc_account_ic_sign_out"
                             android:layout_width="30dp"
                             android:layout_height="match_parent"
                             android:layout_marginEnd="16dp"
@@ -161,7 +161,7 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/acc_name"
+                                android:id="@+id/acc_account_sign_out"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
@@ -215,7 +215,7 @@
                     android:paddingRight="18dp">
 
                     <LinearLayout
-                        android:id="@+id/acc_ex_rem"
+                        android:id="@+id/acc_notification_expiry_row"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="12dp"
@@ -228,7 +228,7 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/acc_notification_ex_rem"
+                                android:id="@+id/acc_notification_expiry_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
@@ -246,7 +246,7 @@
                         </LinearLayout>
 
                         <Switch
-                            android:id="@+id/switch1"
+                            android:id="@+id/acc_switch_expiry"
                             android:layout_width="wrap_content"
                             android:layout_height="48dp"
                             android:layout_weight="3" />
@@ -254,7 +254,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/acc_shopping_reminder"
+                        android:id="@+id/acc_notification_shopping_row"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="12dp"
@@ -267,25 +267,25 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/acc_shopping_reminderr"
+                                android:id="@+id/acc_notification_shopping_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
-                                android:text="@string/acc_expiry_reminders"
+                                android:text="@string/acc_shopping_reminders"
                                 android:textSize="16sp" />
 
                             <TextView
-                                android:id="@+id/acc_shopping_reminder_desc"
+                                android:id="@+id/acc_notification_reminder_desc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
-                                android:text="@string/acc_expiry_desc"
+                                android:text="@string/acc_shopping_desc"
                                 android:textColor="#807e7e"
                                 android:textSize="16sp" />
                         </LinearLayout>
 
                         <Switch
-                            android:id="@+id/switch_shopping_reminder"
+                            android:id="@+id/acc_switch_shopping"
                             android:layout_width="wrap_content"
                             android:layout_height="48dp"
                             android:layout_weight="3" />
@@ -293,7 +293,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/acc_recipe_suggestions"
+                        android:id="@+id/acc_notification_recipe_row"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="12dp"
@@ -306,25 +306,25 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/acc_recipe_suggestionss"
+                                android:id="@+id/acc_notification_recipe"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
-                                android:text="@string/acc_expiry_reminders"
+                                android:text="@string/acc_recipe_suggestions"
                                 android:textSize="16sp" />
 
                             <TextView
-                                android:id="@+id/acc_recipe_suggestionss_desc"
+                                android:id="@+id/acc_notification_recipe_desc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
-                                android:text="@string/acc_expiry_desc"
+                                android:text="@string/acc_recipe_desc"
                                 android:textColor="#807e7e"
                                 android:textSize="16sp" />
                         </LinearLayout>
 
                         <Switch
-                            android:id="@+id/switch_recipe_suggestions"
+                            android:id="@+id/acc_switch_recipe"
                             android:layout_width="wrap_content"
                             android:layout_height="48dp"
                             android:layout_weight="3" />
@@ -332,7 +332,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/acc_low_stock"
+                        android:id="@+id/acc_notification_low_stock_row"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="12dp"
@@ -345,11 +345,11 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/acc_low_stock_"
+                                android:id="@+id/acc_notification_low_stock_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
-                                android:text="@string/acc_expiry_reminders"
+                                android:text="@string/acc_low_stock"
                                 android:textSize="16sp" />
 
                             <TextView
@@ -357,13 +357,13 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
-                                android:text="@string/acc_expiry_desc"
+                                android:text="@string/acc_low_stock_desc"
                                 android:textColor="#807e7e"
                                 android:textSize="16sp" />
                         </LinearLayout>
 
                         <Switch
-                            android:id="@+id/switch_low_stock"
+                            android:id="@+id/acc_switch_low_stock"
                             android:layout_width="wrap_content"
                             android:layout_height="48dp"
                             android:layout_weight="3" />
@@ -414,14 +414,14 @@
                     android:paddingRight="18dp">
 
                     <LinearLayout
-                        android:id="@+id/acc_user"
+                        android:id="@+id/acc_about_help_row"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginBottom="12dp"
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:id="@+id/acc_ic_help"
+                            android:id="@+id/acc_about_ic_help"
                             android:layout_width="30dp"
                             android:layout_height="match_parent"
                             android:layout_marginEnd="16dp"
@@ -433,7 +433,7 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/acc_help_support"
+                                android:id="@+id/acc_about_help_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
@@ -441,10 +441,11 @@
                                 android:textSize="16sp" />
 
                             <TextView
-                                android:id="@+id/acc_help_and_support_desc"
+                                android:id="@+id/acc_about_help_desc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/sf_pro_display_regular"
+                                android:text="@string/acc_help_support_desc"
                                 android:textColor="#807e7e"
                                 android:textSize="16sp" />
                         </LinearLayout>
@@ -452,14 +453,14 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/acc_sign_out"
+                        android:id="@+id/acc_about_version_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:id="@+id/acc_ic_info"
+                            android:id="@+id/acc_about_ic_info"
                             android:layout_width="30dp"
                             android:layout_height="match_parent"
                             android:layout_marginEnd="16dp"
