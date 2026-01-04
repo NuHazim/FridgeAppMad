@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -20,14 +21,23 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
+
+import android.widget.Spinner;
 import android.widget.Toast;
 
 
@@ -41,9 +51,12 @@ public class InventoryFragment extends Fragment {
     private FirebaseFirestore db;
     private CollectionReference itemsRef;
 
+    Spinner spinnerCategoryFilter, spinnerSortExpiry;
+
     RecyclerView recyclerView;
     FridgeAdapter adapter;
-    ArrayList<FridgeItem> fridgeItemList = new ArrayList<>();
+    List<FridgeItem> fridgeItemList = new ArrayList<>(); // shown list
+
 
     Button btnAddItem;
 
@@ -54,7 +67,6 @@ public class InventoryFragment extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
 
-        // ✅ Inflate FIRST
         return inflater.inflate(R.layout.inventoryfrag, container, false);
     }
 
@@ -76,19 +88,22 @@ public class InventoryFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
+        spinnerCategoryFilter = view.findViewById(R.id.spinnerCategory);
 
         itemsRef.addSnapshotListener((snapshots, error) -> {
             if (error != null) return;
             fridgeItemList.clear();
             for (DocumentSnapshot doc : snapshots) {
                 FridgeItem item = doc.toObject(FridgeItem.class);
-                fridgeItemList.add(item);
+                if(item != null){
+                    item.docId = doc.getId();
+                    fridgeItemList.add(item);
+                }
             }
             adapter.notifyDataSetChanged();
         });
 
-
-        // 3️⃣ Activity Result launchers
+        // Activity Result launchers
         scanBarcodeLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -116,7 +131,7 @@ public class InventoryFragment extends Fragment {
                 }
         );
 
-        // 4️⃣ AddItemBottomSheet logic
+        // AddItemBottomSheet logic
         btnAddItem.setOnClickListener(v -> {
             AddItemBottomSheet sheet = new AddItemBottomSheet();
             sheet.setListener(new AddItemBottomSheet.AddItemListener() {

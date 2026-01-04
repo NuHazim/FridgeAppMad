@@ -40,12 +40,6 @@
                 android:paddingLeft="8dp"/>
 
             <TextView
-                android:id="@+id/tvExpiry"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"/>
-
-            <TextView
                 android:id="@+id/tvQuantity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,17 +51,26 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"/>
 
+            <TextView
+                android:id="@+id/tvExpiry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_green"
+                android:textColor="@color/white"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:paddingLeft="8dp"/>
+
         </LinearLayout>
 
-    <!-- Delete Button (RIGHT) -->
     <ImageButton
         android:id="@+id/btnDelete"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@android:drawable/ic_menu_delete"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:tint="@color/orange"
-        android:contentDescription="Delete"/>
+        android:contentDescription="Delete"
+        app:tint="@color/orange"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
