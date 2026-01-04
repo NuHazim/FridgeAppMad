@@ -51,4 +51,8 @@
     <string name="acc_app_version">App Version</string>
     <string name="acc_app_version_desc">1.0.0 - Trial Edition</string>
 
+    <string name="profile_title">Edit Profile</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_password">Password</string>
+
 </resources>
