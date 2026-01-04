@@ -25,4 +25,18 @@
         <item>L</item>
         <item>pcs</item>
     </string-array>
+    <string-array name="sort_expiry_array">
+        <item>Soonest First</item>
+        <item>Latest First</item>
+    </string-array>
+    <string-array name="categories_filter_array">
+        <item>All</item>
+        <item>Dairy</item>
+        <item>Meat</item>
+        <item>Vegetables</item>
+        <item>Fruits</item>
+        <item>Snack</item>
+        <item>Beverages</item>
+        <item>Others</item>
+    </string-array>
 </resources>
