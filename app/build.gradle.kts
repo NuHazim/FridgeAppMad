@@ -40,6 +40,8 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.cardview)
+    implementation(libs.recyclerview)
     testImplementation(libs.junit)
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
     implementation("androidx.camera:camera-camera2:1.3.0")
@@ -53,6 +55,8 @@ dependencies {
     implementation("com.google.guava:guava:31.1-android")
     implementation("com.google.firebase:firebase-firestore:26.0.2")
     implementation("com.google.firebase:firebase-auth:24.0.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.code.gson:gson:2.10.1")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
