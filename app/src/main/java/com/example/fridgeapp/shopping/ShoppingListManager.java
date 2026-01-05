@@ -13,26 +13,46 @@ import java.util.List;
 
 public class ShoppingListManager {
 
-    private static ShoppingListManager instance;
-    private final String PREF_NAME = "shopping_list_pref";
-    private final String KEY_LIST = "shopping_items";
+    private static final String PREF_NAME = "shopping_pref";
+    private static final String KEY_LIST = "shopping_list";
 
+    private static ShoppingListManager instance;
+    private final SharedPreferences preferences;
+    private final Gson gson;
     private List<ShoppingItem> shoppingItems;
-    private SharedPreferences preferences;
-    private Gson gson = new Gson();
 
     private ShoppingListManager(Context context) {
         preferences = context.getApplicationContext()
                 .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
+        gson = new Gson();
         loadItems();
     }
 
-    public static ShoppingListManager getInstance(Context context) {
+    public static synchronized ShoppingListManager getInstance(Context context) {
         if (instance == null) {
             instance = new ShoppingListManager(context);
         }
         return instance;
+    }
+
+    private void loadItems() {
+        String json = preferences.getString(KEY_LIST, null);
+
+        if (json == null) {
+            shoppingItems = new ArrayList<>();
+        } else {
+            Type type = new TypeToken<List<ShoppingItem>>() {}.getType();
+            shoppingItems = gson.fromJson(json, type);
+
+            if (shoppingItems == null)
+                shoppingItems = new ArrayList<>();
+        }
+    }
+
+    private void saveItems() {
+        String json = gson.toJson(shoppingItems);
+        preferences.edit().putString(KEY_LIST, json).apply();
     }
 
     public List<ShoppingItem> getShoppingItems() {
@@ -49,28 +69,8 @@ public class ShoppingListManager {
         saveItems();
     }
 
-    public void clearItems() {
-        shoppingItems.clear();
+    public void updateItem(ShoppingItem item, boolean completed) {
+        item.setCompleted(completed);
         saveItems();
-    }
-
-    private void saveItems() {
-        String json = gson.toJson(shoppingItems);
-        preferences.edit().putString(KEY_LIST, json).apply();
-    }
-
-    private void loadItems() {
-        String json = preferences.getString(KEY_LIST, null);
-
-        if (json == null) {
-            shoppingItems = new ArrayList<>();
-            return;
-        }
-
-        Type type = new TypeToken<List<ShoppingItem>>() {}.getType();
-        shoppingItems = gson.fromJson(json, type);
-
-        if (shoppingItems == null)
-            shoppingItems = new ArrayList<>();
     }
 }
