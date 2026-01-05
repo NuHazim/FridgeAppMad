@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.fridgeapp.account.ProfileActivity;
+import com.example.fridgeapp.recipes.RecipesFragment;
 import com.example.fridgeapp.shopping.shoppingFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.example.fridgeapp.inventory.InventoryFragment;
@@ -87,7 +88,7 @@ public class homepage extends AppCompatActivity {
                         selectedFragment = new shoppingFragment();
                         break;
                     case 2:
-                        selectedFragment = new recipesFragment();
+                        selectedFragment = new RecipesFragment();
                         break;
                 }
 
