@@ -66,7 +66,7 @@ public class RecipesFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         // Initialize ChatGPT Client - REPLACE WITH YOUR ACTUAL API KEY
-        chatGPTClient = new ChatGPTClient("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");
+        chatGPTClient = new ChatGPTClient("API_KEY");
 
         // Initialize views
         btnGenerateRecipes = view.findViewById(R.id.btnGenerateRecipes);
