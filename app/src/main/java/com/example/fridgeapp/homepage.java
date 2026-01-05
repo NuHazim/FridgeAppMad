@@ -1,6 +1,8 @@
 package com.example.fridgeapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.fridgeapp.account.ProfileActivity;
 import com.example.fridgeapp.shopping.shoppingFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.example.fridgeapp.inventory.InventoryFragment;
@@ -37,6 +40,15 @@ public class homepage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.homepage);
+
+        // Account button region
+        TextView profileButton = findViewById(R.id.profileButton);
+        profileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeProfileActivity();
+            }
+        });
 
         tvItemsCount = findViewById(R.id.tvItemsCount);
         tvExpiringCount = findViewById(R.id.tvExpiringCount);
@@ -139,5 +151,11 @@ public class homepage extends AppCompatActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragmentContainer, fragment);
         transaction.commit();
+    }
+
+    //to profile activity
+    private void changeProfileActivity(){
+        Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
     }
 }
