@@ -25,4 +25,48 @@
         <item>L</item>
         <item>pcs</item>
     </string-array>
+    <string-array name="sort_expiry_array">
+        <item>Soonest First</item>
+        <item>Latest First</item>
+    </string-array>
+    <string-array name="categories_filter_array">
+        <item>All</item>
+        <item>Dairy</item>
+        <item>Meat</item>
+        <item>Vegetables</item>
+        <item>Fruits</item>
+        <item>Snack</item>
+        <item>Beverages</item>
+        <item>Others</item>
+    </string-array>
+
+    <string name="acc_header_account">Account</string>
+    <string name="acc_header_notifications">Notifications</string>
+    <string name="acc_header_about">About</string>
+
+    <string name="acc_username">Username</string>
+    <string name="acc_email">email@gmail.com</string>
+    <string name="acc_sign_out">Sign Out</string>
+
+    <string name="acc_expiry_reminders">Expiry Reminders</string>
+    <string name="acc_expiry_desc">Get notified 3 days before items expire</string>
+
+    <string name="acc_shopping_reminders">Shopping Reminders</string>
+    <string name="acc_shopping_desc">Remind me to complete shopping list</string>
+
+    <string name="acc_recipe_suggestions">Recipe Suggestions</string>
+    <string name="acc_recipe_desc">Daily recipe recommendations</string>
+
+    <string name="acc_low_stock">Low Stock Alerts</string>
+    <string name="acc_low_stock_desc">Alert when running low on items</string>
+
+    <string name="acc_help_support">Help and Support</string>
+    <string name="acc_help_support_desc">Get help using the app</string>
+    <string name="acc_app_version">App Version</string>
+    <string name="acc_app_version_desc">1.0.0 - Trial Edition</string>
+
+    <string name="profile_title">Edit Profile</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_password">Password</string>
+
 </resources>

@@ -45,8 +45,18 @@ public class FridgeAdapter extends RecyclerView.Adapter<FridgeAdapter.ViewHolder
         holder.tvQuantity.setText(item.quantity + " " + item.unit);
 
         long daysLeft = item.getDaysLeft();
-        if(daysLeft < 0)holder.tvExpiry.setText("Expired");
-        else holder.tvExpiry.setText(daysLeft + " days left");
+        holder.tvExpiry.setText(daysLeft + " days left");
+        if(daysLeft < 0) {
+            holder.tvExpiry.setText("Expired");
+            holder.tvExpiry.setBackgroundResource(R.drawable.bg_grey);;
+        }
+        else if (daysLeft <= 3) {
+            holder.tvExpiry.setBackgroundResource(R.drawable.bg_red);
+        } else if (daysLeft <= 7) {
+            holder.tvExpiry.setBackgroundResource(R.drawable.bg_yellow);
+        } else {
+            holder.tvExpiry.setBackgroundResource(R.drawable.bg_green);
+        }
 
 
 
