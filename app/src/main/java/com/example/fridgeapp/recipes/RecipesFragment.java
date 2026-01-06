@@ -3,6 +3,7 @@ package com.example.fridgeapp.recipes;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.example.fridgeapp.inventory.FridgeItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -35,9 +37,12 @@ import java.util.Map;
 
 public class RecipesFragment extends Fragment {
 
+    private static final String TAG = "RecipesFragment";
+
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private ChatGPTClient chatGPTClient;
+    private ListenerRegistration recipeListener;
 
     private Button btnGenerateRecipes;
     private TextView tabAllRecipes, tabFavorites, tvLoadingText;
@@ -66,7 +71,7 @@ public class RecipesFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         // Initialize ChatGPT Client - REPLACE WITH YOUR ACTUAL API KEY
-        chatGPTClient = new ChatGPTClient("API_KEY");
+        chatGPTClient = new ChatGPTClient("");
 
         // Initialize views
         btnGenerateRecipes = view.findViewById(R.id.btnGenerateRecipes);
@@ -102,8 +107,62 @@ public class RecipesFragment extends Fragment {
         // Generate recipes button
         btnGenerateRecipes.setOnClickListener(v -> generateRecipes());
 
-        // Load existing recipes
-        loadRecipesFromDb();
+        // Setup real-time listener
+        setupRealtimeListener();
+    }
+
+    private void setupRealtimeListener() {
+        String userId = auth.getCurrentUser().getUid();
+
+        // Remove old listener if exists
+        if (recipeListener != null) {
+            recipeListener.remove();
+        }
+
+        // Setup real-time listener
+        recipeListener = db.collection("users")
+                .document(userId)
+                .collection("recipes")
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Listen failed: " + error.getMessage());
+                        return;
+                    }
+
+                    if (snapshots != null && getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            allRecipes.clear();
+                            favoriteRecipes.clear();
+
+                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                                Recipe recipe = doc.toObject(Recipe.class);
+                                if (recipe != null) {
+                                    recipe.setDocId(doc.getId());
+                                    allRecipes.add(recipe);
+
+                                    if (recipe.isFavorite()) {
+                                        favoriteRecipes.add(recipe);
+                                    }
+                                }
+                            }
+
+                            Log.d(TAG, "Loaded " + allRecipes.size() + " recipes");
+
+                            // Hide loading when recipes are loaded
+                            showLoading(false);
+
+                            updateUI();
+                        });
+                    }
+                });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (recipeListener != null) {
+            recipeListener.remove();
+        }
     }
 
     private void generateRecipes() {
@@ -150,19 +209,25 @@ public class RecipesFragment extends Fragment {
                     chatGPTClient.sendMessage(prompt, new ChatGPTClient.ChatCallback() {
                         @Override
                         public void onSuccess(String reply) {
-                            new Handler(Looper.getMainLooper()).post(() -> {
-                                parseAndSaveRecipes(reply, userIngredients);
-                            });
+                            Log.d(TAG, "ChatGPT response received");
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    parseAndSaveRecipes(reply, userIngredients);
+                                });
+                            }
                         }
 
                         @Override
                         public void onError(String error) {
-                            new Handler(Looper.getMainLooper()).post(() -> {
-                                showLoading(false);
-                                Toast.makeText(getContext(),
-                                        "Failed to generate recipes: " + error,
-                                        Toast.LENGTH_LONG).show();
-                            });
+                            Log.e(TAG, "ChatGPT error: " + error);
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    showLoading(false);
+                                    Toast.makeText(getContext(),
+                                            "Failed to generate recipes: " + error,
+                                            Toast.LENGTH_LONG).show();
+                                });
+                            }
                         }
                     });
                 })
@@ -231,13 +296,23 @@ public class RecipesFragment extends Fragment {
 
                         // Now save new recipes
                         saveRecipesToDb(recipesArray, userId, userIngredients);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to delete old recipes: " + e.getMessage());
+                        // Try to save anyway
+                        saveRecipesToDb(recipesArray, userId, userIngredients);
                     });
 
         } catch (Exception e) {
-            showLoading(false);
-            Toast.makeText(getContext(),
-                    "Failed to parse recipes: " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Parse error: " + e.getMessage());
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    showLoading(false);
+                    Toast.makeText(getContext(),
+                            "Failed to parse recipes: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                });
+            }
         }
     }
 
@@ -245,6 +320,8 @@ public class RecipesFragment extends Fragment {
                                  List<FridgeItem> userIngredients) {
         int totalRecipes = recipesArray.size();
         int[] savedCount = {0};
+
+        Log.d(TAG, "Saving " + totalRecipes + " recipes");
 
         for (int i = 0; i < recipesArray.size(); i++) {
             JsonObject recipeJson = recipesArray.get(i).getAsJsonObject();
@@ -291,49 +368,32 @@ public class RecipesFragment extends Fragment {
                     .add(recipe)
                     .addOnSuccessListener(documentReference -> {
                         savedCount[0]++;
+                        Log.d(TAG, "Saved recipe " + savedCount[0] + "/" + totalRecipes);
+
                         if (savedCount[0] == totalRecipes) {
-                            showLoading(false);
-                            loadRecipesFromDb();
-                            Toast.makeText(getContext(),
-                                    "Successfully generated " + totalRecipes + " recipes!",
-                                    Toast.LENGTH_SHORT).show();
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    showLoading(false);
+                                    Toast.makeText(getContext(),
+                                            "Successfully generated " + totalRecipes + " recipes!",
+                                            Toast.LENGTH_SHORT).show();
+                                });
+                            }
                         }
                     })
                     .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to save recipe: " + e.getMessage());
                         savedCount[0]++;
+
                         if (savedCount[0] == totalRecipes) {
-                            showLoading(false);
-                            loadRecipesFromDb();
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    showLoading(false);
+                                });
+                            }
                         }
                     });
         }
-    }
-
-    private void loadRecipesFromDb() {
-        String userId = auth.getCurrentUser().getUid();
-
-        db.collection("users")
-                .document(userId)
-                .collection("recipes")
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    allRecipes.clear();
-                    favoriteRecipes.clear();
-
-                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        Recipe recipe = doc.toObject(Recipe.class);
-                        if (recipe != null) {
-                            recipe.setDocId(doc.getId());
-                            allRecipes.add(recipe);
-
-                            if (recipe.isFavorite()) {
-                                favoriteRecipes.add(recipe);
-                            }
-                        }
-                    }
-
-                    updateUI();
-                });
     }
 
     private void showRecipeDetail(Recipe recipe) {
@@ -413,29 +473,42 @@ public class RecipesFragment extends Fragment {
     }
 
     private void toggleFavorite(Recipe recipe, int position) {
-        recipe.setFavorite(!recipe.isFavorite());
+        boolean newFavoriteState = !recipe.isFavorite();
+        recipe.setFavorite(newFavoriteState);
+
+        // Update UI immediately for better UX
+        adapter.notifyItemChanged(position);
 
         String userId = auth.getCurrentUser().getUid();
         db.collection("users")
                 .document(userId)
                 .collection("recipes")
                 .document(recipe.getDocId())
-                .update("favorite", recipe.isFavorite())
+                .update("favorite", newFavoriteState)
                 .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Favorite updated successfully");
+
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            String message = newFavoriteState ?
+                                    "Added to favorites" : "Removed from favorites";
+                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to update favorite: " + e.getMessage());
+
+                    // Revert the change on failure
+                    recipe.setFavorite(!newFavoriteState);
                     adapter.notifyItemChanged(position);
 
-                    // Update favorites list
-                    if (recipe.isFavorite()) {
-                        if (!favoriteRecipes.contains(recipe)) {
-                            favoriteRecipes.add(recipe);
-                        }
-                    } else {
-                        favoriteRecipes.remove(recipe);
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            Toast.makeText(getContext(), "Failed to update favorite",
+                                    Toast.LENGTH_SHORT).show();
+                        });
                     }
-
-                    String message = recipe.isFavorite() ?
-                            "Added to favorites" : "Removed from favorites";
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -507,9 +580,14 @@ public class RecipesFragment extends Fragment {
     }
 
     private void showLoading(boolean show) {
-        loadingIndicator.setVisibility(show ? View.VISIBLE : View.GONE);
-        tvLoadingText.setVisibility(show ? View.VISIBLE : View.GONE);
-        recyclerViewRecipes.setVisibility(show ? View.GONE : View.VISIBLE);
-        btnGenerateRecipes.setEnabled(!show);
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                loadingIndicator.setVisibility(show ? View.VISIBLE : View.GONE);
+                tvLoadingText.setVisibility(show ? View.VISIBLE : View.GONE);
+                emptyStateLayout.setVisibility(View.GONE); // Hide empty state when loading
+                recyclerViewRecipes.setVisibility(show ? View.GONE : View.VISIBLE);
+                btnGenerateRecipes.setEnabled(!show);
+            });
+        }
     }
 }
