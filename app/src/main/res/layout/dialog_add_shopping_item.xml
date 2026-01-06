@@ -211,8 +211,8 @@
             android:textAllCaps="false" />
     </GridLayout>
 
-    <!-- Add Item Button -->
-    <Button
+    <!-- Add Item Button (Rounded Orange) -->
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnAddItem"
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -220,6 +220,7 @@
         android:textColor="#FFFFFF"
         android:textSize="15sp"
         android:background="@drawable/btn_add_item"
+        android:backgroundTint="#FD9700"
         android:textStyle="bold"
         android:textAllCaps="false" />
 </LinearLayout>
