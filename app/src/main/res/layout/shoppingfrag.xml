@@ -13,7 +13,7 @@
         android:id="@+id/btnAddItemBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFD54F"
+        android:background="#FD9700"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="12dp">
