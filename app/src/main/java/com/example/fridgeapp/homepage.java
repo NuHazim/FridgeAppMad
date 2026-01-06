@@ -19,6 +19,7 @@ import com.example.fridgeapp.inventory.InventoryFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,6 +37,9 @@ public class homepage extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+
+    private ListenerRegistration itemsListener;
+    private ListenerRegistration shoppingListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,7 @@ public class homepage extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         listenForItemsCount();
+        listenForShoppingListCount();
 
         // Setup Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -112,24 +117,23 @@ public class homepage extends AppCompatActivity {
     private void listenForItemsCount() {
         String userId = auth.getCurrentUser().getUid();
 
-        db.collection("users")
+        itemsListener = db.collection("users")
                 .document(userId)
                 .collection("items")
-                .addSnapshotListener((snapshot, e) ->{
+                .addSnapshotListener((snapshot, e) -> {
 
-                    if(snapshot == null) return;
+                    if (snapshot == null) return;
 
                     int totalItems = snapshot.size();
                     int expiringSoon = 0;
-//                    int itemToBuy = 0;
 
                     long now = System.currentTimeMillis();
 
-                    for(DocumentSnapshot doc : snapshot){
+                    for (DocumentSnapshot doc : snapshot) {
                         String expiry = doc.getString("expiry");
-                        if(expiry == null) continue;
+                        if (expiry == null) continue;
 
-                        try{
+                        try {
                             SimpleDateFormat sdf =
                                     new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
@@ -141,10 +145,40 @@ public class homepage extends AppCompatActivity {
                             if (diffDays <= 3) {
                                 expiringSoon++;
                             }
-                        }catch (Exception ignored){}
+                        } catch (Exception ignored) {
+                        }
                     }
                     tvItemsCount.setText(String.valueOf(totalItems));
                     tvExpiringCount.setText(String.valueOf(expiringSoon));
+                });
+    }
+
+    private void listenForShoppingListCount() {
+        String userId = auth.getCurrentUser().getUid();
+
+        shoppingListener = db.collection("users")
+                .document(userId)
+                .collection("shoppingItems")
+                .addSnapshotListener((snapshot, e) -> {
+
+                    if (snapshot == null) {
+                        tvToBuyCount.setText("0");
+                        return;
+                    }
+
+                    int uncompletedItems = 0;
+
+                    for (DocumentSnapshot doc : snapshot) {
+                        // Get the completed field, default to false if it doesn't exist
+                        Boolean isCompleted = doc.getBoolean("completed");
+
+                        // Count only uncompleted items (not checked)
+                        if (isCompleted == null || !isCompleted) {
+                            uncompletedItems++;
+                        }
+                    }
+
+                    tvToBuyCount.setText(String.valueOf(uncompletedItems));
                 });
     }
 
@@ -155,8 +189,20 @@ public class homepage extends AppCompatActivity {
     }
 
     //to profile activity
-    private void changeProfileActivity(){
+    private void changeProfileActivity() {
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Remove listeners to prevent memory leaks
+        if (itemsListener != null) {
+            itemsListener.remove();
+        }
+        if (shoppingListener != null) {
+            shoppingListener.remove();
+        }
     }
 }
