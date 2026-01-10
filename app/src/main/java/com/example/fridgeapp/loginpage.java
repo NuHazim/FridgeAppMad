@@ -190,18 +190,6 @@ public class loginpage extends AppCompatActivity {
                     startActivity(new Intent(this, homepage.class));
                     finish();
                 });
-//        new android.os.Handler().postDelayed(() -> {
-//
-//            pbRegister.setVisibility(View.GONE);
-//            btnSignUp.setEnabled(true);
-//
-//            Toast.makeText(this, "Register success", Toast.LENGTH_SHORT).show();
-//
-//            Intent intent = new Intent(loginpage.this, homepage.class);
-//            startActivity(intent);
-//            finish();
-//
-//        }, 2000);
     }
 
     private void handleLogin(FirebaseAuth auth) {
@@ -229,18 +217,6 @@ public class loginpage extends AppCompatActivity {
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
                 });
 
-//        new android.os.Handler().postDelayed(() -> {
-//
-//            pbLogin.setVisibility(View.GONE);
-//            btnLogin.setEnabled(true);
-//
-//            Toast.makeText(this, "Login success", Toast.LENGTH_SHORT).show();
-//
-//            Intent intent = new Intent(loginpage.this, homepage.class);
-//            startActivity(intent);
-//            finish();
-//
-//        }, 2000);
     }
 
     @Override
