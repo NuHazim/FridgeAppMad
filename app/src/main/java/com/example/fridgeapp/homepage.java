@@ -121,7 +121,7 @@ public class homepage extends AppCompatActivity {
 
                     int totalItems = snapshot.size();
                     int expiringSoon = 0;
-//                    int itemToBuy = 0;
+                    int itemToBuy = 0;
 
                     long now = System.currentTimeMillis();
 

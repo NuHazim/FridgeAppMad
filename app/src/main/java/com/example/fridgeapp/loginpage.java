@@ -219,12 +219,15 @@ public class loginpage extends AppCompatActivity {
 
 
         auth.signInWithEmailAndPassword(email, password).addOnSuccessListener(result -> {
+                    pbLogin.setVisibility(View.GONE);
                     startActivity(new Intent(this, homepage.class));
                     finish();
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show()
-                );
+                .addOnFailureListener(e ->{
+                    pbLogin.setVisibility(View.GONE);
+                    btnLogin.setEnabled(true);
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                });
 
 //        new android.os.Handler().postDelayed(() -> {
 //
