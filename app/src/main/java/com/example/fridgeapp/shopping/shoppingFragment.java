@@ -8,41 +8,31 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fridgeapp.R;
-import com.example.fridgeapp.inventory.FridgeItem;
 import com.example.fridgeapp.model.ShoppingItem;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.UUID;
 
 public class shoppingFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ShoppingAdapter adapter;
-    private Button btnAddItemBar, btnCompletePurchase;
+    private LinearLayout btnAddItemBar;
     private TextView tvItemCount, tvCompletedCount, tvEmptyState;
 
-    private FirebaseAuth auth;
-    private FirebaseFirestore db;
-    private CollectionReference shoppingRef;
-    private List<ShoppingItem> shoppingItems = new ArrayList<>();
+    private ShoppingListManager shoppingListManager;
+    private List<ShoppingItem> shoppingItems;
 
     @Nullable
     @Override
@@ -52,26 +42,20 @@ public class shoppingFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.shoppingfrag, container, false);
 
-        auth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-
-        shoppingRef = db.collection("users")
-                .document(Objects.requireNonNull(auth.getUid()))
-                .collection("shoppingItems");
+        shoppingListManager = ShoppingListManager.getInstance(requireContext());
+        shoppingItems = shoppingListManager.getShoppingItems();
 
         recyclerView = view.findViewById(R.id.recyclerViewShopping);
         btnAddItemBar = view.findViewById(R.id.btnAddItemBar);
-        btnCompletePurchase = view.findViewById(R.id.btnCompletePurchase);
         tvItemCount = view.findViewById(R.id.tvItemCount);
         tvCompletedCount = view.findViewById(R.id.tvCompletedCount);
         tvEmptyState = view.findViewById(R.id.tvEmptyState);
 
         setupAdapter();
-        loadItemsFromFirebase();
 
         btnAddItemBar.setOnClickListener(v -> showAddItemDialog());
-        btnCompletePurchase.setOnClickListener(v -> completePurchase());
 
+        updateUI();
         return view;
     }
 
@@ -79,12 +63,13 @@ public class shoppingFragment extends Fragment {
         adapter = new ShoppingAdapter(
                 shoppingItems,
                 (item, isChecked) -> {
-                    item.setCompleted(isChecked);
-                    updateItemInFirebase(item);
+                    shoppingListManager.updateItem(item, isChecked);
                     updateUI();
                 },
                 item -> {
-                    deleteItemFromFirebase(item);
+                    shoppingListManager.removeItem(item);
+                    adapter.notifyDataSetChanged();
+                    updateUI();
                 }
         );
 
@@ -92,34 +77,12 @@ public class shoppingFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
-    private void loadItemsFromFirebase() {
-        shoppingRef.addSnapshotListener((snapshots, error) -> {
-            if (error != null) {
-                Toast.makeText(getContext(), "Error loading items", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            shoppingItems.clear();
-            for (DocumentSnapshot doc : snapshots) {
-                ShoppingItem item = doc.toObject(ShoppingItem.class);
-                if (item != null) {
-                    item.setId(doc.getId());
-                    shoppingItems.add(item);
-                }
-            }
-            adapter.notifyDataSetChanged();
-            updateUI();
-        });
-    }
-
     private void showAddItemDialog() {
         View dialogView = LayoutInflater.from(getContext())
                 .inflate(R.layout.dialog_add_shopping_item, null);
 
         EditText etItemName = dialogView.findViewById(R.id.etItemName);
-        EditText etQuantityNumber = dialogView.findViewById(R.id.etQuantityNumber);
-        Spinner spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
-        Spinner spinnerUnit = dialogView.findViewById(R.id.spinnerUnit);
+        EditText etQuantity = dialogView.findViewById(R.id.etQuantity);
         Button btnAddItem = dialogView.findViewById(R.id.btnAddItem);
         TextView btnClose = dialogView.findViewById(R.id.btnClose);
 
@@ -129,7 +92,6 @@ public class shoppingFragment extends Fragment {
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
-        // Setup quick add buttons
         setupQuickAddButton(dialogView, R.id.btnMilk, "Milk", etItemName);
         setupQuickAddButton(dialogView, R.id.btnEggs, "Eggs", etItemName);
         setupQuickAddButton(dialogView, R.id.btnBread, "Bread", etItemName);
@@ -142,35 +104,26 @@ public class shoppingFragment extends Fragment {
 
         btnAddItem.setOnClickListener(v -> {
             String name = etItemName.getText().toString().trim();
-            String qtyStr = etQuantityNumber.getText().toString().trim();
-            String category = spinnerCategory.getSelectedItem().toString();
-            String unit = spinnerUnit.getSelectedItem().toString();
+            String qty = etQuantity.getText().toString().trim();
 
             if (name.isEmpty()) {
                 Toast.makeText(getContext(), "Enter item name", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            int quantityNumber = 1;
-            if (!qtyStr.isEmpty()) {
-                try {
-                    quantityNumber = Integer.parseInt(qtyStr);
-                } catch (NumberFormatException e) {
-                    Toast.makeText(getContext(), "Invalid quantity", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
+            if (qty.isEmpty()) qty = "1";
 
             ShoppingItem newItem = new ShoppingItem(
-                    null,
+                    UUID.randomUUID().toString(),
                     name,
-                    category,
-                    quantityNumber,
-                    unit,
+                    qty,
                     false
             );
 
-            addItemToFirebase(newItem);
+            shoppingListManager.addItem(newItem);
+            adapter.notifyDataSetChanged();
+            updateUI();
+
             dialog.dismiss();
         });
 
@@ -179,150 +132,21 @@ public class shoppingFragment extends Fragment {
 
     private void setupQuickAddButton(View dialogView, int buttonId,
                                      String value, EditText etItemName) {
+
         Button btn = dialogView.findViewById(buttonId);
         if (btn != null) btn.setOnClickListener(v -> etItemName.setText(value));
-    }
-
-    private void addItemToFirebase(ShoppingItem item) {
-        shoppingRef.add(item)
-                .addOnSuccessListener(docRef -> {
-                    Toast.makeText(getContext(), "Item added", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to add item", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void updateItemInFirebase(ShoppingItem item) {
-        if (item.getId() != null) {
-            shoppingRef.document(item.getId())
-                    .set(item)
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Failed to update item", Toast.LENGTH_SHORT).show();
-                    });
-        }
-    }
-
-    private void deleteItemFromFirebase(ShoppingItem item) {
-        if (item.getId() != null) {
-            shoppingRef.document(item.getId())
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(getContext(), "Item deleted", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Failed to delete item", Toast.LENGTH_SHORT).show();
-                    });
-        }
-    }
-
-    private void completePurchase() {
-        List<ShoppingItem> completedItems = new ArrayList<>();
-
-        for (ShoppingItem item : shoppingItems) {
-            if (item.isCompleted()) {
-                completedItems.add(item);
-            }
-        }
-
-        if (completedItems.isEmpty()) {
-            Toast.makeText(getContext(), "No items selected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Transfer to inventory
-        String userId = auth.getCurrentUser().getUid();
-        CollectionReference inventoryRef = db.collection("users")
-                .document(userId)
-                .collection("items");
-
-        int totalItems = completedItems.size();
-
-        for (ShoppingItem shoppingItem : completedItems) {
-            // First, uncheck in Firebase IMMEDIATELY
-            shoppingItem.setCompleted(false);
-            updateItemInFirebase(shoppingItem);
-
-            // Calculate expiry date based on category
-            String expiryDate = calculateExpiryDate(shoppingItem.getCategory());
-
-            // Create FridgeItem
-            FridgeItem fridgeItem = new FridgeItem(
-                    null,
-                    shoppingItem.getName(),
-                    shoppingItem.getCategory(),
-                    expiryDate,
-                    shoppingItem.getQuantityNumber(),
-                    shoppingItem.getUnit()
-            );
-
-            // Add to inventory
-            inventoryRef.add(fridgeItem)
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(),
-                                "Failed to add " + shoppingItem.getName() + " to inventory",
-                                Toast.LENGTH_SHORT).show();
-                    });
-        }
-
-        Toast.makeText(getContext(),
-                totalItems + " items added to inventory",
-                Toast.LENGTH_SHORT).show();
-    }
-
-    private String calculateExpiryDate(String category) {
-        int daysToAdd;
-
-        switch (category) {
-            case "Dairy":
-                daysToAdd = 14;
-                break;
-            case "Meat":
-                daysToAdd = 3;
-                break;
-            case "Vegetables":
-                daysToAdd = 7;
-                break;
-            case "Fruits":
-                daysToAdd = 7;
-                break;
-            case "Snacks":
-                daysToAdd = 90;
-                break;
-            case "Beverages":
-                daysToAdd = 20;
-                break;
-            case "Others":
-            default:
-                daysToAdd = 14;
-                break;
-        }
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, daysToAdd);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        return sdf.format(calendar.getTime());
     }
 
     private void updateUI() {
         int count = shoppingItems.size();
         int completed = 0;
 
-        for (ShoppingItem i : shoppingItems) {
+        for (ShoppingItem i : shoppingItems)
             if (i.isCompleted()) completed++;
-        }
 
         tvItemCount.setText(count + " items");
         tvCompletedCount.setText(completed + " completed");
 
-        // Show/hide complete purchase button
-        if (completed > 0) {
-            btnCompletePurchase.setVisibility(View.VISIBLE);
-        } else {
-            btnCompletePurchase.setVisibility(View.GONE);
-        }
-
-        // Show/hide empty state
         if (count == 0) {
             tvEmptyState.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
@@ -335,6 +159,7 @@ public class shoppingFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        adapter.notifyDataSetChanged();
         updateUI();
     }
 }
