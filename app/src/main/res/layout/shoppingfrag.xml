@@ -4,44 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFE8E8"
+    android:background="#e8e8e8"
     android:orientation="vertical"
     tools:context=".shopping.shoppingFragment">
 
     <!-- Add Item Button (Yellow Bar) -->
-    <LinearLayout
+    <Button
         android:id="@+id/btnAddItemBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FD9700"
+        android:backgroundTint="#FD9700"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="12dp">
-
-        <TextView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Add Item to the Shopping List"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:padding="12dp"
+        android:text="+ Add Item to the Shopping List"
+        android:layout_margin="20px">
+    </Button>
 
     <!-- Item Count Bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFF3E0"
+        android:background="#e8e8e8"
         android:orientation="horizontal"
         android:padding="12dp"
         android:paddingStart="16dp"
@@ -70,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#FFE8E8">
+        android:background="#e8e8e8">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewShopping"
@@ -98,5 +82,20 @@
             android:textSize="16sp"
             android:visibility="gone" />
     </FrameLayout>
+
+    <!-- Complete Purchase Button (shown at bottom when items are checked) -->
+    <Button
+        android:id="@+id/btnCompletePurchase"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Complete Purchase"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:backgroundTint="#4CAF50"
+        android:padding="16dp"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+        android:textAllCaps="false" />
 
 </LinearLayout>
