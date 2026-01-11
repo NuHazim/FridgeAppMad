@@ -1,9 +1,9 @@
 package com.example.fridgeapp.recipes;
 
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -48,11 +48,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.tvDifficulty.setText(recipe.getDifficulty());
         holder.tvTime.setText(recipe.getEstimatedTime());
 
-        // Set favorite icon
+        // Toggle between solid and regular heart by changing fontFamily
         if (recipe.isFavorite()) {
-            holder.btnFavorite.setImageResource(android.R.drawable.star_big_on);
+            // Solid heart (filled)
+            holder.btnFavorite.setTypeface(holder.itemView.getContext().getResources().getFont(R.font.fa_solid_900));
         } else {
-            holder.btnFavorite.setImageResource(android.R.drawable.star_big_off);
+            // Regular heart (outline)
+            holder.btnFavorite.setTypeface(holder.itemView.getContext().getResources().getFont(R.font.fa_regular_400));
         }
 
         // Show ingredient status
@@ -90,7 +92,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
         CardView cardRecipe;
         TextView tvRecipeName, tvDifficulty, tvTime, tvIngredientStatus;
-        ImageButton btnFavorite;
+        TextView btnFavorite; // Changed from ImageButton to TextView
 
         public RecipeViewHolder(@NonNull View itemView) {
             super(itemView);

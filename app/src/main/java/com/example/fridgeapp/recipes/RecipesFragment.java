@@ -242,14 +242,17 @@ public class RecipesFragment extends Fragment {
     private String createRecipePrompt(String ingredients) {
         return "You are a helpful cooking assistant. I have the following ingredients in my fridge:\n\n" +
                 ingredients + "\n\n" +
-                "Please generate exactly 10 different recipes. For each recipe:\n" +
-                "1. Use ingredients I have, OR suggest recipes where I have at least 50% of the ingredients\n" +
-                "2. If a recipe requires ingredients I don't have, list them separately\n\n" +
-                "Respond ONLY with a valid JSON array in this exact format (no extra text):\n" +
+                "IMPORTANT RULES:\n" +
+                "1. Generate exactly 10 different recipes\n" +
+                "2. Each recipe MUST use at least 50% of its ingredients from MY available ingredients\n" +
+                "3. DO NOT suggest recipes where I have less than 50% of the required ingredients\n" +
+                "4. If a recipe needs ingredients I don't have, list them in 'missingIngredients'\n" +
+                "5. Make sure the recipes are realistic and can be made with what I have\n\n" +
+                "Respond ONLY with a valid JSON array in this exact format (no extra text, no markdown):\n" +
                 "[\n" +
                 "  {\n" +
                 "    \"name\": \"Recipe Name\",\n" +
-                "    \"difficulty\": \"Easy/Medium/Hard\",\n" +
+                "    \"difficulty\": \"Easy\",\n" +
                 "    \"estimatedTime\": \"30 min\",\n" +
                 "    \"calories\": \"450 kcal\",\n" +
                 "    \"ingredients\": {\n" +
@@ -263,7 +266,7 @@ public class RecipesFragment extends Fragment {
                 "    ]\n" +
                 "  }\n" +
                 "]\n\n" +
-                "Make sure the JSON is valid and properly formatted.";
+                "Remember: Only suggest recipes where I have at least 50% of the ingredients!";
     }
 
     private void parseAndSaveRecipes(String jsonResponse, List<FridgeItem> userIngredients) {
@@ -320,6 +323,13 @@ public class RecipesFragment extends Fragment {
                                  List<FridgeItem> userIngredients) {
         int totalRecipes = recipesArray.size();
         int[] savedCount = {0};
+        int[] validRecipes = {0};
+
+        // Create a set of user ingredients (lowercase for matching)
+        Map<String, FridgeItem> userIngredientsMap = new HashMap<>();
+        for (FridgeItem item : userIngredients) {
+            userIngredientsMap.put(item.getName().toLowerCase().trim(), item);
+        }
 
         Log.d(TAG, "Saving " + totalRecipes + " recipes");
 
@@ -333,66 +343,91 @@ public class RecipesFragment extends Fragment {
                 ingredients.put(key, ingredientsObj.get(key).getAsString());
             }
 
-            // Parse steps
-            List<String> steps = new ArrayList<>();
-            JsonArray stepsArray = recipeJson.getAsJsonArray("steps");
-            for (int j = 0; j < stepsArray.size(); j++) {
-                steps.add(stepsArray.get(j).getAsString());
-            }
-
-            // Parse missing ingredients
+            // Calculate which ingredients are missing
             List<String> missingIngredients = new ArrayList<>();
-            if (recipeJson.has("missingIngredients")) {
-                JsonArray missingArray = recipeJson.getAsJsonArray("missingIngredients");
-                for (int j = 0; j < missingArray.size(); j++) {
-                    missingIngredients.add(missingArray.get(j).getAsString());
+            int matchCount = 0;
+
+            for (String ingredientName : ingredients.keySet()) {
+                String normalizedName = ingredientName.toLowerCase().trim();
+                boolean found = false;
+
+                // Check if user has this ingredient (flexible matching)
+                for (String userIngredient : userIngredientsMap.keySet()) {
+                    if (normalizedName.contains(userIngredient) || userIngredient.contains(normalizedName)) {
+                        found = true;
+                        matchCount++;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    missingIngredients.add(ingredientName);
                 }
             }
 
-            Recipe recipe = new Recipe(
-                    null,
-                    recipeJson.get("name").getAsString(),
-                    recipeJson.get("difficulty").getAsString(),
-                    recipeJson.get("estimatedTime").getAsString(),
-                    recipeJson.get("calories").getAsString(),
-                    ingredients,
-                    steps,
-                    false,
-                    missingIngredients
-            );
+            // Calculate match percentage
+            int totalIngredients = ingredients.size();
+            double matchPercentage = totalIngredients > 0 ? (matchCount * 100.0 / totalIngredients) : 0;
 
-            // Save to Firestore
-            db.collection("users")
-                    .document(userId)
-                    .collection("recipes")
-                    .add(recipe)
-                    .addOnSuccessListener(documentReference -> {
-                        savedCount[0]++;
-                        Log.d(TAG, "Saved recipe " + savedCount[0] + "/" + totalRecipes);
+            Log.d(TAG, "Recipe: " + recipeJson.get("name").getAsString() +
+                    " - Match: " + matchCount + "/" + totalIngredients +
+                    " (" + matchPercentage + "%)");
 
-                        if (savedCount[0] == totalRecipes) {
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> {
-                                    showLoading(false);
-                                    Toast.makeText(getContext(),
-                                            "Successfully generated " + totalRecipes + " recipes!",
-                                            Toast.LENGTH_SHORT).show();
-                                });
-                            }
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to save recipe: " + e.getMessage());
-                        savedCount[0]++;
+            // Only save recipes with 50%+ match OR if user has very few ingredients (2 or less)
+            if (matchPercentage >= 50 || userIngredients.size() <= 2) {
+                // Parse steps
+                List<String> steps = new ArrayList<>();
+                JsonArray stepsArray = recipeJson.getAsJsonArray("steps");
+                for (int j = 0; j < stepsArray.size(); j++) {
+                    steps.add(stepsArray.get(j).getAsString());
+                }
 
-                        if (savedCount[0] == totalRecipes) {
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(() -> {
-                                    showLoading(false);
-                                });
-                            }
+                Recipe recipe = new Recipe(
+                        null,
+                        recipeJson.get("name").getAsString(),
+                        recipeJson.get("difficulty").getAsString(),
+                        recipeJson.get("estimatedTime").getAsString(),
+                        recipeJson.get("calories").getAsString(),
+                        ingredients,
+                        steps,
+                        false,
+                        missingIngredients
+                );
+
+                // Save to Firestore
+                db.collection("users")
+                        .document(userId)
+                        .collection("recipes")
+                        .add(recipe)
+                        .addOnSuccessListener(documentReference -> {
+                            validRecipes[0]++;
+                            Log.d(TAG, "Saved recipe " + validRecipes[0]);
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Failed to save recipe: " + e.getMessage());
+                        });
+            } else {
+                Log.d(TAG, "Skipped recipe (below 50% match): " + recipeJson.get("name").getAsString());
+            }
+
+            savedCount[0]++;
+            if (savedCount[0] == totalRecipes) {
+                // All recipes processed
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        showLoading(false);
+                        if (validRecipes[0] > 0) {
+                            Toast.makeText(getContext(),
+                                    "Generated " + validRecipes[0] + " recipes!",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(),
+                                    "Not enough ingredients to generate recipes. Add more items!",
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
+                }
+            }
         }
     }
 

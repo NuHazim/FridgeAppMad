@@ -79,15 +79,19 @@
 
         </LinearLayout>
 
-        <!-- Favorite Button -->
-        <ImageButton
+        <!-- Favorite Button (FontAwesome) -->
+        <TextView
             android:id="@+id/btnFavorite"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:fontFamily="@font/fa_regular_400"
+            android:text="&#xf004;"
+            android:textSize="24sp"
+            android:textColor="#FF5722"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/star_big_off"
-            app:tint="#FF9800"
-            android:scaleType="centerInside"
             android:padding="8dp"/>
 
     </LinearLayout>

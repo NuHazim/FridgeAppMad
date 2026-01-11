@@ -56,7 +56,26 @@
         android:background="@android:drawable/edit_text"
         android:layout_marginBottom="16dp" />
 
-    <!-- Quantity Label -->
+    <!-- Category Label -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Category"
+        android:textSize="13sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Category Spinner -->
+    <Spinner
+        android:id="@+id/spinnerCategory"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@android:drawable/edit_text"
+        android:padding="12dp"
+        android:entries="@array/categories_array"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Quantity Section -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,16 +84,35 @@
         android:textColor="#666666"
         android:layout_marginBottom="8dp" />
 
-    <!-- Quantity Input -->
-    <EditText
-        android:id="@+id/etQuantity"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="e.g. 1 gallon, 2lbs..."
-        android:textSize="14sp"
-        android:padding="12dp"
-        android:background="@android:drawable/edit_text"
-        android:layout_marginBottom="20dp" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+
+        <!-- Quantity Number Input -->
+        <EditText
+            android:id="@+id/etQuantityNumber"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:hint="Amount"
+            android:inputType="number"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Unit Spinner -->
+        <Spinner
+            android:id="@+id/spinnerUnit"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:entries="@array/units_array" />
+    </LinearLayout>
 
     <!-- Quick Add Label -->
     <TextView
@@ -216,10 +254,10 @@
         android:id="@+id/btnAddItem"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:backgroundTint="@color/orange"
         android:text="Add Item"
+        android:textAllCaps="false"
         android:textColor="#FFFFFF"
         android:textSize="15sp"
-        android:background="@drawable/btn_add_item"
-        android:textStyle="bold"
-        android:textAllCaps="false" />
+        android:textStyle="bold" />
 </LinearLayout>

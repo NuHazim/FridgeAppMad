@@ -11,6 +11,7 @@
         <item>Beverages</item>
         <item>Others</item>
     </string-array>
+
     <string-array name="expiry_array">
         <item>3 days</item>
         <item>7 days</item>
@@ -19,6 +20,13 @@
         <item>90 days</item>
     </string-array>
     <string-array name="unit_array">
+        <item>g</item>
+        <item>kg</item>
+        <item>ml</item>
+        <item>L</item>
+        <item>pcs</item>
+    </string-array>
+    <string-array name="units_array">
         <item>g</item>
         <item>kg</item>
         <item>ml</item>

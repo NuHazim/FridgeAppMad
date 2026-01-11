@@ -74,19 +74,44 @@ public class RecipeDetailDialog extends DialogFragment {
         tvDetailTime.setText(recipe.getEstimatedTime());
         tvDetailCalories.setText(recipe.getCalories());
 
-        // Add ingredients
+        // Create a set of missing ingredients for easy lookup
+        java.util.Set<String> missingIngredientsSet = new java.util.HashSet<>();
+        if (recipe.getMissingIngredients() != null) {
+            for (String missing : recipe.getMissingIngredients()) {
+                missingIngredientsSet.add(missing.toLowerCase().trim());
+            }
+        }
+
+        // Add ingredients with color coding
         if (recipe.getIngredients() != null) {
             for (Map.Entry<String, String> entry : recipe.getIngredients().entrySet()) {
                 TextView ingredientView = new TextView(getContext());
                 ingredientView.setText("• " + entry.getKey() + ": " + entry.getValue());
                 ingredientView.setTextSize(14);
-                ingredientView.setTextColor(0xFF4CAF50); // Green - available
+
+                // Check if this ingredient is missing
+                String ingredientName = entry.getKey().toLowerCase().trim();
+                boolean isMissing = false;
+
+                for (String missing : missingIngredientsSet) {
+                    if (ingredientName.contains(missing) || missing.contains(ingredientName)) {
+                        isMissing = true;
+                        break;
+                    }
+                }
+
+                if (isMissing) {
+                    ingredientView.setTextColor(0xFFFF5722); // Red - missing
+                } else {
+                    ingredientView.setTextColor(0xFF4CAF50); // Green - available
+                }
+
                 ingredientView.setPadding(0, 8, 0, 8);
                 ingredientsContainer.addView(ingredientView);
             }
         }
 
-        // Add missing ingredients if any
+        // Add missing ingredients section (if any)
         if (recipe.getMissingIngredients() != null && !recipe.getMissingIngredients().isEmpty()) {
             missingIngredientsSection.setVisibility(View.VISIBLE);
             for (String ingredient : recipe.getMissingIngredients()) {
