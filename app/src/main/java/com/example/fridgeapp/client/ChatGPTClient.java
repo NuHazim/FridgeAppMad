@@ -1,4 +1,4 @@
-package com.example.fridgeapp;
+package com.example.fridgeapp.client;
 
 import okhttp3.*;
 import com.google.gson.Gson;

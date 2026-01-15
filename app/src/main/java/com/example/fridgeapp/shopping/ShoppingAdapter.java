@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fridgeapp.R;
-import com.example.fridgeapp.model.ShoppingItem;
 
 import java.util.List;
 

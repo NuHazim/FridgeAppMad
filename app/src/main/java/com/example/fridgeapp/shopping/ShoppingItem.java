@@ -1,4 +1,4 @@
-package com.example.fridgeapp.model;
+package com.example.fridgeapp.shopping;
 
 public class ShoppingItem {
     public String id;

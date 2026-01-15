@@ -1,8 +1,6 @@
 package com.example.fridgeapp.recipes;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.fridgeapp.ChatGPTClient;
+import com.example.fridgeapp.client.ChatGPTClient;
 import com.example.fridgeapp.R;
 import com.example.fridgeapp.inventory.FridgeItem;
 import com.google.firebase.auth.FirebaseAuth;

@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.example.fridgeapp.R;
 import com.example.fridgeapp.inventory.FridgeItem;
-import com.example.fridgeapp.model.ShoppingItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;

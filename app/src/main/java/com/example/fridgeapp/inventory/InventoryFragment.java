@@ -51,11 +51,13 @@ public class InventoryFragment extends Fragment {
     private FirebaseFirestore db;
     private CollectionReference itemsRef;
 
-    Spinner spinnerCategoryFilter, spinnerSortExpiry;
+    Spinner spinnerCategoryFilter;
 
     RecyclerView recyclerView;
     FridgeAdapter adapter;
     List<FridgeItem> fridgeItemList = new ArrayList<>(); // shown list
+    List<FridgeItem> filteredFridgeItems = new ArrayList<>(); // filtered list
+
 
 
     Button btnAddItem;
@@ -84,24 +86,16 @@ public class InventoryFragment extends Fragment {
 
         btnAddItem = view.findViewById(R.id.btnAddItem);
         recyclerView = view.findViewById(R.id.recyclerView);
-        adapter = new FridgeAdapter(fridgeItemList);
+        spinnerCategoryFilter = view.findViewById(R.id.spinnerCategory);
+
+
+        adapter = new FridgeAdapter(filteredFridgeItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        spinnerCategoryFilter = view.findViewById(R.id.spinnerCategory);
+        setupCategorySpinnerListener();
+        setupFireStoreSnapshotListener();
 
-        itemsRef.addSnapshotListener((snapshots, error) -> {
-            if (error != null) return;
-            fridgeItemList.clear();
-            for (DocumentSnapshot doc : snapshots) {
-                FridgeItem item = doc.toObject(FridgeItem.class);
-                if(item != null){
-                    item.docId = doc.getId();
-                    fridgeItemList.add(item);
-                }
-            }
-            adapter.notifyDataSetChanged();
-        });
 
         // Activity Result launchers
         scanBarcodeLauncher = registerForActivityResult(
@@ -139,10 +133,7 @@ public class InventoryFragment extends Fragment {
                 public void onScanSelected() {
                     if (ContextCompat.checkSelfPermission(requireContext(),
                             Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-
-                        Intent intent = new Intent(getActivity(), BarcodeActivity.class);
-                        scanBarcodeLauncher.launch(intent);
-
+                            openScanner();
                     } else {
                         cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
                     }
@@ -154,7 +145,6 @@ public class InventoryFragment extends Fragment {
             });
             sheet.show(getParentFragmentManager(), "AddItemBottomSheet");
         });
-        loadItemsFromDb();
     }
 
 
@@ -199,9 +189,7 @@ public class InventoryFragment extends Fragment {
                 .collection("items")
                 .add(item)
                 .addOnSuccessListener(doc -> {
-                    item.docId = doc.getId();
-                    fridgeItemList.add(item);
-                    adapter.notifyItemInserted(fridgeItemList.size() - 1);
+                    Toast.makeText(getContext(), "Item saved successfully", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(),
@@ -209,27 +197,52 @@ public class InventoryFragment extends Fragment {
                                 Toast.LENGTH_SHORT).show()
                 );
     }
+    private void setupCategorySpinnerListener() {
+        spinnerCategoryFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                filterList();
+            }
 
-    private void loadItemsFromDb() {
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
+    }
 
-        String userId = auth.getCurrentUser().getUid();
+    private void setupFireStoreSnapshotListener(){
+        itemsRef.addSnapshotListener((snapshots, error) -> {
+            if (error != null) return;
+            fridgeItemList.clear();
+            for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                FridgeItem item = doc.toObject(FridgeItem.class);
+                if(item != null){
+                    item.docId = doc.getId();
+                    fridgeItemList.add(item);
+                }
+            }
+            filterList();
+        });
+    }
 
-        db.collection("users")
-                .document(userId)
-                .collection("items")
-                .get()
-                .addOnSuccessListener(query -> {
 
-                    fridgeItemList.clear();
+    private void filterList() {
+        String selectedCategory = spinnerCategoryFilter.getSelectedItem().toString();
 
-                    for (DocumentSnapshot doc : query.getDocuments()) {
-                        FridgeItem item = doc.toObject(FridgeItem.class);
-                        item.docId = doc.getId();
-                        fridgeItemList.add(item);
-                    }
+        filteredFridgeItems.clear();
 
-                    adapter.notifyDataSetChanged();
-                });
+        // If "All Categories" is selected, show all items
+        if ("All".equalsIgnoreCase(selectedCategory)) {
+            filteredFridgeItems.addAll(fridgeItemList);
+        } else {
+            for (FridgeItem item : fridgeItemList) {
+                if (item.getCategory() != null && item.getCategory().equalsIgnoreCase(selectedCategory)) {
+                    filteredFridgeItems.add(item);
+                }
+            }
+        }
+        adapter.notifyDataSetChanged();
     }
 
 

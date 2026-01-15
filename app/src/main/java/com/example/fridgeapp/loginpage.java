@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -184,6 +185,7 @@ public class loginpage extends AppCompatActivity {
                             .collection("users")
                             .document(auth.getUid())
                             .set(new HashMap<String, Object>() {{
+                                put("username", username);
                                 put("email", email);
                             }});
 
@@ -191,6 +193,8 @@ public class loginpage extends AppCompatActivity {
                     finish();
                 });
     }
+
+
 
     private void handleLogin(FirebaseAuth auth) {
 

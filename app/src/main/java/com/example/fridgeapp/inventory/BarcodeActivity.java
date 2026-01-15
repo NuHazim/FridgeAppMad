@@ -15,9 +15,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 
 import com.example.fridgeapp.R;
-import com.example.fridgeapp.inventory.FoodApiService;
-import com.example.fridgeapp.inventory.FoodResponse;
-import com.example.fridgeapp.inventory.RetrofitClient;
+import com.example.fridgeapp.client.RetrofitClient;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -93,7 +91,6 @@ public class BarcodeActivity extends AppCompatActivity {
                                             if (rawValue != null) {
                                                 scanned = true;
 
-                                                // ✅ Call API with the barcode
                                                 fetchProductInfo(rawValue);
 
                                                 imageProxy.close();

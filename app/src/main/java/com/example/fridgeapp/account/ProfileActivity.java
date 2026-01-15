@@ -22,7 +22,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    TextView acc_account_name, acc_account_email;
+    private TextView acc_account_name, acc_account_email;
+    private FirebaseAuth auth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,57 +35,10 @@ public class ProfileActivity extends AppCompatActivity {
         acc_account_name = findViewById(R.id.acc_account_name);
         acc_account_email = findViewById(R.id.acc_account_email);
 
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        String userId = auth.getCurrentUser().getUid();
-
-        db.collection("users")
-                .document(userId)
-                .get()
-                .addOnSuccessListener(document -> {
-                    if (document.exists()) {
-                        String username = document.getString("username");
-                        String email = document.getString("email");
-
-                        acc_account_name.setText(username);
-                        acc_account_email.setText(email);
-                    }
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this,
-                                "Failed to load profile",
-                                Toast.LENGTH_SHORT).show()
-                );
-
-
-
-        //code to go back to homepage
-        ImageView acc_ic_back = findViewById(R.id.ic_back);
-        acc_ic_back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                homepageActivity();
-            }
-        });
-
-        //code to go username edit
-        LinearLayout acc_account_user_row = findViewById(R.id.acc_account_user_row);
-        acc_account_user_row.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editProfileActivity();
-            }
-        });
-
-        LinearLayout acc_account_sign_out_row = findViewById(R.id.acc_account_sign_out_row);
-        acc_account_sign_out_row.setOnClickListener((new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                signOutActivity();
-            }
-        }));
+        setupClickListeners();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -91,6 +46,57 @@ public class ProfileActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadUserData();
+    }
+
+    private void loadUserData() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            db.collection("users")
+                    .document(userId)
+                    .get()
+                    .addOnSuccessListener(document -> {
+                        if (document.exists()) {
+                            String username = document.getString("username");
+                            String email = document.getString("email");
+
+                            acc_account_name.setText(username);
+                            acc_account_email.setText(email);
+                        } else {
+                            Toast.makeText(this, "User data not found.", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this,
+                                    "Failed to load profile",
+                                    Toast.LENGTH_SHORT).show()
+                    );
+        } else {
+            Toast.makeText(this, "No user logged in.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void setupClickListeners() {
+        //code to go back to homepage
+        ImageView acc_ic_back = findViewById(R.id.ic_back);
+        acc_ic_back.setOnClickListener(v -> homepageActivity());
+
+        //code to go username edit
+        LinearLayout acc_account_user_row = findViewById(R.id.acc_account_user_row);
+        acc_account_user_row.setOnClickListener(v -> editProfileActivity());
+
+        LinearLayout acc_account_sign_out_row = findViewById(R.id.acc_account_sign_out_row);
+        acc_account_sign_out_row.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            signOutActivity();
+        });
+    }
+
 
     private void signOutActivity() {
         Intent intent = new Intent(this, loginpage.class);

@@ -38,6 +38,8 @@ public class FridgeItem {
         return unit;
     }
 
+    public String getCategory(){return category;}
+
     public long getDaysLeft() {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
